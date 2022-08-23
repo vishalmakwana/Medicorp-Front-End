@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'medicorpadmin'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_318FCC1C48454922B564A0BC17B62A9D }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_562DE90F41354A6B9969F6BE615DB36F }}
           package: .
