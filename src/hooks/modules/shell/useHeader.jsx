@@ -193,10 +193,10 @@ const useHeader = () => {
                 col: 4,
                 titleProp: "City",
                 validator: validator.requiredValidator("City"),
-                value: rowData.cityId && { label: rowData?.cityName, id: rowData.cityId },
+                value: rowData?.cityId && { label: rowData?.cityName, id: rowData?.cityId },
                 menuItems: cityData ? cityData.map(g => ({
-                    label: g.cityName,
-                    id: g.cityId
+                    label: g?.cityName,
+                    id: g?.cityId
                 })).sort((a, b) => (a.text ?? "").localeCompare(b.text ?? "")) : [],
                 equalityComparer: (option, value) => option.cityId === value,
             },

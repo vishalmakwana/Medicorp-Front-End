@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react'
 import { Context, useTableIcons, appSettings, useAxios, useConfirm, format, validator, usersDataColumn, Strings } from "@medicorp"
+import { useEffect } from 'react'
 const useUsers = () => {
     const { logMessage } = useContext(Context)
     const { endpointConfig, fieldTypes, statusType } = appSettings
@@ -12,14 +13,18 @@ const useUsers = () => {
     const [modalActions, setModalActions] = useState([])
     const [modalFormResetKeys, setModalFormResetKeys] = useState([])
     const [modalTaskRunning, setModalTaskRunning] = useState(false)
-
+    const [stateData, setStateData] = useState([])
+    const [cityData, setCityData] = useState([])
 
 
     const [{ data: users, loading: usersLoading }, refetchUsers] = useAxios(endpointConfig.users.getAll)
+    const [{ data: countries, loading: countriesLoading }, refetchCountries] = useAxios(endpointConfig.country.getAll)
     const [{ }, refetchUsersById] = useAxios(endpointConfig.users.getUsersById, { manual: true })
+    const [{ }, stateByCountryId] = useAxios(format(endpointConfig.state.getStateByCountryId), { manual: true })
+    const [{ }, cityByStateId] = useAxios(endpointConfig.city.getCityByStateId, { manual: true })
     const [{ }, saveUsers] = useAxios(
         {
-            url: endpointConfig.users.postUsers,
+            url: endpointConfig.register.register,
             method: "POST"
         },
         { manual: true })
@@ -45,12 +50,12 @@ const useUsers = () => {
 
 
     const actions = [
-        // {
-        //     icon: tableIcons.Add,
-        //     tooltip: "Add User",
-        //     isFreeAction: true,
-        //     onClick: (event, rowData) => handleActionClick(event, false, false, {})
-        // },
+        {
+            icon: tableIcons.Add,
+            tooltip: "Add User",
+            isFreeAction: true,
+            onClick: (event, rowData) => handleActionClick(event, false, false, {})
+        },
         // {
         //     icon: tableIcons.Edit,
         //     tooltip: "Edit Product",
@@ -144,6 +149,7 @@ const useUsers = () => {
     ]
 
     const handleActionClick = (event, isEdit = false, isView = false, rowData = {}) => {
+
         setModalHeader({
             isForm: true,
             title: isEdit === true ? Strings.EDIT_USERS : Strings.ADD_USERS,
@@ -177,7 +183,7 @@ const useUsers = () => {
                 variant: "outlined",
                 col: 12,
                 type: fieldTypes.radioGroup.type,
-                value: rowData?.gender ?? "",
+                value: rowData?.gender ?? "Male",
                 options: [
                     { text: "Male", val: "Male" },
                     { text: "Female", val: "Female" }
@@ -198,7 +204,7 @@ const useUsers = () => {
                 disabled: isView === true,
                 validator: validator.emailValidator
             },
-            phone: {
+            mobileNo: {
                 label: Strings.COLUMN_PHONE,
                 size: "small",
                 variant: "outlined",
@@ -207,7 +213,97 @@ const useUsers = () => {
                 value: rowData?.phoneNumber ?? "",
                 disabled: isView === true,
                 validator: validator.phoneValidator
-            }
+            },
+            Password: {
+                label: Strings.NEW_PASSWORD,
+                size: "small",
+                variant: "outlined",
+                col: 6,
+                type: fieldTypes.password.type,
+                value: "",
+                validator: validator.passwordValidator
+            },
+            confirmPassword: {
+                label: Strings.CONFIRM_NEW_PASSWORD,
+                size: "small",
+                variant: "outlined",
+                col: 6,
+                type: fieldTypes.password.type,
+                value: "",
+                match: {
+                    field: "Password",
+                    errorMsg: "both password are not matching!",
+                },
+                // validator: validator.confirmPasswordValidator("newPassword")
+            },
+            countryId: {
+                label: Strings.COLUMN_COUNTRY,
+                type: fieldTypes.autoComplete.type,
+                size: "small",
+                variant: "outlined",
+                col: 4,
+                titleProp: "country",
+                validator: validator.requiredValidator("Country"),
+                value: rowData?.countryId && { label: rowData?.countryName, id: rowData?.countryId },
+                menuItems: countries?.data ? countries?.data.map(g => ({
+                    label: g.countryName,
+                    id: g.countryId
+                })).sort((a, b) => (a.text ?? "").localeCompare(b.text ?? "")) : [],
+                equalityComparer: (option, value) => option.countryId === value,
+                onSelectionChange: (id) => { handleSelectionChange(id, "country") }
+            },
+            stateId: {
+                label: Strings.COLUMN_STATE,
+                type: fieldTypes.autoComplete.type,
+                size: "small",
+                variant: "outlined",
+                col: 4,
+                titleProp: "State",
+                validator: validator.requiredValidator("State"),
+                value: rowData?.stateId && { label: rowData?.stateName, id: rowData?.stateId },
+                menuItems: stateData ? stateData.map(g => ({
+                    label: g.stateName,
+                    id: g.stateId
+                })).sort((a, b) => (a.text ?? "").localeCompare(b.text ?? "")) : [],
+                equalityComparer: (option, value) => option.stateId === value,
+                onSelectionChange: (id) => { handleSelectionChange(id, "state") },
+                disabled: stateData.length == 0 ? true : false
+            },
+            cityId: {
+                label: Strings.COLUMN_CITY,
+                type: fieldTypes.autoComplete.type,
+                size: "small",
+                variant: "outlined",
+                col: 4,
+                titleProp: "City",
+                validator: validator.requiredValidator("City"),
+                value: rowData?.cityId && { label: rowData?.cityName, id: rowData?.cityId },
+                menuItems: cityData ? cityData.map(g => ({
+                    label: g?.cityName,
+                    id: g?.cityId
+                })).sort((a, b) => (a.text ?? "").localeCompare(b.text ?? "")) : [],
+                equalityComparer: (option, value) => option.cityId === value,
+                disabled: cityData.length == 0 ? true : false
+            },
+            Address: {
+                label: Strings.COLUMN_ADDRESS,
+                size: "small",
+                variant: "outlined",
+                col: 12,
+                type: fieldTypes.textArea.type,
+                value: rowData?.addresses ?? "",
+                disabled: isView === true,
+                validator: validator.textAreaValidator
+            },
+            isActive: {
+                label: Strings.COLUMN_USERS_IS_ACTIVE,
+                size: "small",
+                variant: "outlined",
+                col: 12,
+                type: fieldTypes.checkbox.type,
+                value: rowData?.isActive ?? true,
+                disabled: isView === true,
+            },
         })
         setModalActions(isView === true ? [] : [
             {
@@ -219,15 +315,70 @@ const useUsers = () => {
         ])
         setOpenDialog(true)
     }
+
+    const handleSelectionChange = (data, dataType) => {
+        const { id } = data
+        if (dataType === "country") {
+            new Promise((resolve, reject) => {
+                stateByCountryId({ url: format(endpointConfig.state.getStateByCountryId, id) })
+                    .then((res) => {
+                        resolve(res)
+                    }).catch((error) => {
+                        reject(error)
+                        logMessage({
+                            severity: statusType.error,
+                            msg: Strings.ERROR_GETTING_DATA
+                        })
+                    })
+            }).then((data) => {
+                // modalContentDispatch("COUNTRY", data?.data?.data)
+                setStateData(data?.data?.data)
+            })
+        } else if (dataType === "state") {
+            new Promise((resolve, reject) => {
+                cityByStateId({ url: format(endpointConfig.city.getCityByStateId, id) })
+                    .then((res) => {
+                        resolve(res)
+                    }).catch((error) => {
+                        reject(error)
+                        logMessage({
+                            severity: statusType.error,
+                            msg: Strings.ERROR_GETTING_DATA
+                        })
+                    })
+            }).then((data) => {
+                // modalContentDispatch("STATE", data?.data?.data)
+                setCityData(data?.data?.data)
+            })
+        }
+    }
+
     const handleSubmit = (data, isEdit, id) => {
         setModalTaskRunning(true)
         const response = isEdit === true ? updateUsers({
             data: {
                 // id: Number(id),
+                ...data,
                 organizationId: 1,
-                ...data
+                companyId: 1,
+                isWebAccesses: true,
+                roleId: '1',
+                stateId: data.stateId.id,
+                cityId: data.cityId.id,
+                countryId: data.countryId.id
             }
-        }) : saveUsers({ data })
+        }) : saveUsers({
+            data: {
+                ...data,
+                organizationId: 1,
+                companyId: 1,
+                isWebAccesses: true,
+                roleId: '1',
+                stateId: data.stateId.id,
+                cityId: data.cityId.id,
+                countryId: data.countryId.id
+            }
+        })
         response.then((res) => {
             const { msg, errorMessage, message, title } = res.data
             if (res.status === 200) {
@@ -244,6 +395,37 @@ const useUsers = () => {
     }
 
     const { columns } = usersDataColumn()
+
+    useEffect(() => {
+        setModalFormResetKeys(["stateId"])
+        setModalContent(prevContent => ({
+            ...prevContent,
+            stateId: {
+                ...prevContent["stateId"],
+                menuItems: stateData && stateData.map(g => ({
+                    label: g.stateName,
+                    id: g.stateId
+                })).sort((a, b) => (a.text ?? "").localeCompare(b.text ?? "")),
+                disabled: stateData.length > 0 && false,
+                value: null
+            }
+        }))
+    }, [stateData])
+    useEffect(() => {
+        setModalFormResetKeys(["cityId"])
+        setModalContent(prevContent => ({
+            ...prevContent,
+            cityId: {
+                ...prevContent["cityId"],
+                menuItems: cityData && cityData.map(g => ({
+                    label: g.cityName,
+                    id: g.cityId
+                })).sort((a, b) => (a.text ?? "").localeCompare(b.text ?? "")),
+                disabled: cityData.length > 0 && false,
+                value: null
+            }
+        }))
+    }, [cityData])
 
     const handleModalClose = () => {
         setOpenDialog(false)
