@@ -346,7 +346,6 @@ export default function useDoctors() {
     }
 
     const handleSubmit = (data, isEdit, id, organizationName, organizationId) => {
-        setModalFormResetKeys([])
         setModalTaskRunning(true)
         const response = isEdit === true ? updateDoctors({
             data: {
@@ -372,18 +371,17 @@ export default function useDoctors() {
             }
         })
         response.then((res) => {
-            const { msg, errorMessage, message, title, isError, errorTitle, status } = res.data
-            if (res.status === 200) {
+            const { msg, errorMessage, message, title, isError, errorTitle, statusCode } = res.data
+            if (res?.data?.statusCode === 200) {
                 // handleModalClose()
                 refetchDoctors()
                 handleModalClose()
             }
             logMessage({
-                severity: !isError && status != 400 ? statusType.success : statusType.error,
+                severity: !isError && statusCode != 400 ? statusType.success : statusType.error,
                 msg: msg ?? message ?? errorTitle ?? title ?? errorMessage ?? Strings.DATA_ADDED_SUCCESSFULLY
             })
-        })
-            .catch(err => err)
+        }).catch(err => err)
             .finally(() => setModalTaskRunning(false))
     }
 
