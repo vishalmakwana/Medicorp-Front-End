@@ -26,9 +26,9 @@ const Presentation = () => {
     allPresentationLoading,
     clearCTAButton,
     filterReportLabel,
-    CTAButtons
+    CTAButtons,
+    presentationColumns
   } = usePresentation();
-  const { presentationColumns } = presentationDataColumns();
   const { materialTableStyle: tableStyle } = useStyles();
   return (
     <>

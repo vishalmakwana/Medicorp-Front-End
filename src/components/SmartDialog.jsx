@@ -894,6 +894,51 @@ const SmartDialog = ({
 
                                                 {/* ------------------------------------------ Image Upload End ----------------------------------------------------- */}
 
+                                                {/* ------------------------------------------ default image Upload Start ----------------------------------------------------- */}
+
+                                                <Controller
+                                                    case={fieldTypes.defaultImage.type}
+                                                    name={`${key}`}
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <>
+
+                                                            <Grid sx={{ display: item.isHidden ? 'none' : 'block' }} container direction={"row"} spacing={1}>
+
+                                                                <Grid item xs={3} spacing={3} sx={{
+                                                                    margin: '20px 0px 6px 0px',
+                                                                    display: "flex",
+                                                                    flexDirection: "column",
+                                                                    justifyContent: "space-between",
+                                                                }}>
+
+                                                                    <Card sx={{ maxWidth: 345 }}>
+                                                                        <CardMedia
+                                                                            component="img"
+                                                                            height="140"
+                                                                            image={item.value}
+                                                                            // image={URL.createObjectURL(imageValue)}
+                                                                            alt={item.name}
+                                                                            key={item.name}
+                                                                        />
+                                                                        <CardActions>
+                                                                            <ButtonGroup variant="contained" fullWidth aria-label="outlined primary button group">
+                                                                                {/* <Button onClick={() => { removeSelectedImage(item.name) }}>{<Delete />}</Button> */}
+                                                                                <Button style={styles.imgUploadPreviewBTN} onClick={() => { viewSelectedImage(item.value, item.name) }}>{<Visibility />}</Button>
+                                                                            </ButtonGroup>
+                                                                        </CardActions>
+                                                                    </Card>
+
+
+                                                                </Grid>
+                                                                {uploadImgViewURL && <Lightbox image={uploadImgViewURL[0]} title={uploadImgViewURL[1]} onClose={() => setUploadImgViewURL()}></Lightbox>}
+                                                            </Grid>
+                                                        </>
+                                                    )}
+                                                />
+
+                                                {/* ------------------------------------------default  Image Upload End ----------------------------------------------------- */}
+
 
 
                                                 {/* ------------------------------------------ Image DropZone Begin ----------------------------------------------------- */}
@@ -924,8 +969,9 @@ const SmartDialog = ({
                                                                     {...field}
                                                                     fileObjects={[]}
                                                                     open={dropZoneOpen}
-                                                                    initialFiles={[item?.value]}
+                                                                    // initialFiles={[item?.value]}
                                                                     onSave={(e, data) => {
+                                                                        item.onChange(e, data)
                                                                         field.onChange(data)
                                                                         item.handleSave(e, data)
                                                                         setdropZoneOpen(false)

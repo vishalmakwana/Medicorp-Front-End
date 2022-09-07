@@ -48,7 +48,6 @@ export default function doctorsDataColumns() {
         { title: Strings.COLUMN_DOCTORS_EMAIL, field: 'email' },
         { title: Strings.COLUMN_MOBILE_NUMBER, field: 'mobileNumber' },
         { title: Strings.COLUMN_PHONE_NUMBER, field: 'phoneNumber' },
-        { title: Strings.COLUMN_CLINIC_PHONE_NUMBER, field: 'clinicPhoneNumber' },
         { title: Strings.COLUMN_ANNIVERSARY_DATE, field: 'anniversaryDate' },
         { title: Strings.COLUMN_DATE_OF_BIRTH, field: 'dateOfBirth' },
         {

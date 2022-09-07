@@ -163,6 +163,7 @@ const useProducts = () => {
       header: isEdit ? Strings.EDIT_PRODUCTS : Strings.ADD_PRODUCTS,
       modalWidth: "md",
     });
+    productImages = rowData?.images
     setModalContent({
       categoryId: {
         label: Strings.TITLE_CATEGORY,
@@ -218,15 +219,37 @@ const useProducts = () => {
         value: rowData?.isActive ?? false,
         disabled: isView === true,
       },
+      productImage: {
+        type: fieldTypes.defaultImage.type,
+        name: "productImage",
+        value: rowData?.images?.[0]?.imageUrl ?? [],
+        isHidden: rowData?.images?.[0]?.imageUrl ? false : true
+      },
       imageMaster: {
         size: "small",
         col: 12,
         type: fieldTypes.imageDropzone.type,
-        value: rowData?.images?.[0]?.imageUrl ?? [],
+        value: rowData?.images?.[0]?.imageUrl ?? "",
         handleSave: (e, data) => {
           productImages = e[0]
         },
         filesLimit: 1,
+        onChange: (data) => {
+          if (data.length > 0) {
+            setModalContent(prevContent => {
+              setModalFormResetKeys(['productImage']);
+              return ({
+                ...prevContent,
+                productImage: {
+                  ...prevContent['productImage'],
+                  value: URL.createObjectURL(data[0])
+                }
+              })
+            }
+
+            )
+          }
+        },
         maxFileSize: 10000000,
       },
     });
@@ -241,79 +264,17 @@ const useProducts = () => {
     setOpenDialog(true);
   };
 
-  const handleSubmit = (data, isEdit, rowData) => {
+  const handleSubmit = async (data, isEdit, rowData) => {
     const formData = new FormData()
+    let imageUrl = productImages[0]?.imageUrl
+    let imageFile = productImages[0]?.imageFile
+    if (imageUrl) {
+      imageUrl = imageUrl.trim().split('/').slice(-2).join('/')
+    }
     formData.append("uploadedFile", productImages);
-    UploadProductImage({ data: formData }).then((res) => {
-      const { imageFile, imageUrl } = res?.data
-      setModalTaskRunning(true);
-      setModalFormResetKeys([]);
-      const response =
-        isEdit === true
-          ? updateProduct({
-            url: format(
-              endpointConfig.products.updateProducts,
-              rowData.productId
-            ),
-            data: {
-              ...data,
-              productId: rowData.productId,
-              isDelete: false,
-              organizationId: 1,
-              imageMaster: [
-                {
-                  productId: rowData.productId,
-                  organizationId: 1,
-                  imageUrl: imageUrl,
-                  isActive: true,
-                  isDelete: false,
-                  imageFile: imageFile
-                }
-              ]
-            },
-          })
-          : postProduct({
-            data: {
-              ...data,
-              isDelete: false,
-              organizationId: 1,
-              imageMaster: [
-                {
-                  organizationId: 1,
-                  imageUrl: imageUrl,
-                  isActive: true,
-                  isDelete: false,
-                  imageFile: imageFile
-                }
-              ]
-            }
-          });
-      response
-        .then((res) => {
-          const { message, title, errorTitle, isError, status, errors } =
-            res.data;
-          console.log(res.data);
-          if (res.status === 200 || res.status === 201) {
-            handleModalClose();
-            refetchAllProducts();
-            logMessage({
-              severity: statusType.success,
-              msg:
-                isEdit === true
-                  ? Strings.EDITED_SUCCESSFULLY
-                  : Strings.DATA_ADDED_SUCCESSFULLY
-            });
-          }
-          if (res.status === 400) {
-            logMessage({
-              severity: (isError || Object.keys(errors).length > 0) ? statusType.error : statusType.success,
-              msg: message ?? errorTitle ?? title ?? Strings.ERROR_OCCURED_WHILE_ADDING_DATA
-            });
-          }
-
-        })
-        .catch((err) => err)
-        .finally(() => setModalTaskRunning(false));
+    !imageUrl && await UploadProductImage({ data: formData }).then((res) => {
+      imageFile = res?.data?.imageFile
+      imageUrl = res?.data?.imageUrl
     }).catch((err) => {
       console.log(err)
       logMessage({
@@ -321,6 +282,74 @@ const useProducts = () => {
         msg: Strings.ERROR_OCCURED_WHILE_UPLOADING_IMAGE_DATA
       });
     })
+    const response =
+      isEdit === true
+        ? updateProduct({
+          url: format(
+            endpointConfig.products.updateProducts,
+            rowData.productId
+          ),
+          data: {
+            ...data,
+            productId: rowData.productId,
+            isDelete: false,
+            organizationId: 1,
+            imageMaster: [
+              {
+                // iamgeId: iamgeId,
+                productId: rowData.productId,
+                organizationId: 1,
+                imageUrl: imageUrl,
+                isActive: true,
+                isDelete: false,
+                imageFile: imageFile
+              }
+            ]
+          },
+        })
+        : postProduct({
+          data: {
+            ...data,
+            isDelete: false,
+            organizationId: 1,
+            imageMaster: [
+              {
+                organizationId: 1,
+                imageUrl: imageUrl,
+                isActive: true,
+                isDelete: false,
+                imageFile: imageFile
+              }
+            ]
+          }
+        });
+    response
+      .then((res) => {
+        const { message, title, errorTitle, isError, status, errors } =
+          res.data;
+        console.log(res.data);
+        if (res.status === 200 || res.status === 201) {
+          handleModalClose();
+          setModalFormResetKeys([]);
+          refetchAllProducts();
+          logMessage({
+            severity: statusType.success,
+            msg:
+              isEdit === true
+                ? Strings.EDITED_SUCCESSFULLY
+                : Strings.DATA_ADDED_SUCCESSFULLY
+          });
+        }
+        if (res.status === 400) {
+          logMessage({
+            severity: (isError || Object.keys(errors).length > 0) ? statusType.error : statusType.success,
+            msg: message ?? errorTitle ?? title ?? Strings.ERROR_OCCURED_WHILE_ADDING_DATA
+          });
+        }
+
+      })
+      .catch((err) => err)
+      .finally(() => setModalTaskRunning(false));
 
   };
 

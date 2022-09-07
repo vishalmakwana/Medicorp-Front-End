@@ -1,0 +1,72 @@
+{
+  "name": "medicorp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@emotion/react": "^11.8.1",
+    "@emotion/styled": "^11.8.1",
+    "@material-table/core": "^0.2.32",
+    "@mui/icons-material": "^5.4.4",
+    "@mui/lab": "5.0.0-alpha.71",
+    "@mui/material": "^5.4.4",
+    "@mui/styles": "^5.4.4",
+    "axios": "^0.26.0",
+    "axios-hooks": "^3.0.1",
+    "env-cmd": "^10.1.0",
+    "lru-cache": "^7.8.1",
+    "material-ui-confirm": "^3.0.3",
+    "moment": "^2.29.1",
+    "prop-types": "^15.8.1",
+    "react": "^17.0.2",
+    "react-ace": "^9.5.0",
+    "react-awesome-lightbox": "^1.8.1",
+    "react-beautiful-dnd": "^13.1.0",
+    "react-dom": "^17.0.2",
+    "react-error-boundary": "^3.1.4",
+    "react-hook-form": "^7.27.1",
+    "react-mui-counter": "^1.0.9",
+    "react-mui-dropzone": "^4.0.6",
+    "react-router-dom": "^6.2.2",
+    "react-scripts": "5.0.0",
+    "react-spinners": "^0.13.1",
+    "react-string-format": "^1.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "set PORT=3006 && env-cmd -f ./config/.env.dev react-scripts start",
+    "start-staging": "env-cmd -f ./config/.env.staging react-scripts start",
+    "start-prod": "env-cmd -f ./config/.env.prod react-scripts start",
+    "start-qa": "env-cmd -f ./config/.env.qa react-scripts start",
+    "build": " env-cmd -f ./config/.env.dev react-scripts build",
+    "build-staging": "rm -r build; env-cmd -f ./config/.env.staging react-scripts build",
+    "build-prod": "rm -r build; env-cmd -f ./config/.env.prod react-scripts build",
+    "build-qa": "rm -r build; env-cmd -f ./config/.env.qa react-scripts build",
+    "test": "env-cmd -f ./config/.env.dev react-scripts test",
+    "test-staging": "env-cmd -f ./config/.env.staging react-scripts test",
+    "test-prod": "env-cmd -f ./config/.env.prod react-scripts test",
+    "test-qa": "env-cmd -f ./config/.env.qa react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "babel-plugin-import": "^1.13.5"
+  }
+}

@@ -15,9 +15,10 @@ const PresentationDetailPanel = ({ presentationId, isEditOption = false }) => {
         presentationProductLoading
     } = usePresentationDetailPanel(presentationId)
 
+
     const { materialTableStyle: tableStyle } = useStyles()
     const navigate = useNavigate()
-    console.log(producstsData);
+
     return (
         <>
             <Box sx={{ typography: 'body1' }}>

@@ -372,12 +372,16 @@ const usePresentationHistory = () => {
             setIsLoading(false)
         })
     }
+    const placeToLocation = (rowData) => {
+        console.log(rowData);
+
+    }
 
     const handleModalClose = () => {
         setOpenDialog(false);
         setModalFormResetKeys([]);
     };
-    const { presentationHistoryColumns } = presentationHistoryDataColumns(handleDoctorNameClick, handleUserNameClick, handlePresentationClick);
+    const { presentationHistoryColumns } = presentationHistoryDataColumns(handleDoctorNameClick, handleUserNameClick, handlePresentationClick, placeToLocation);
     return {
         tableRef,
         AllPresentationHistory,

@@ -126,6 +126,7 @@ export { default as usersDataColumn } from "dataColumns/usersDataColumn";
 export { default as presentationDataColumns } from "dataColumns/presentationDataColumns";
 export { default as presentationHistoryDataColumns } from "dataColumns/presentationHistoryDataColumns";
 export { default as presentationProductDataColumns } from "dataColumns/presentationProductDataColumns";
+export { default as presentationHistoryByPresentationIdDataColumns } from "dataColumns/presentationHistoryByPresentationIdDataColumns";
 
 //#endregion
 

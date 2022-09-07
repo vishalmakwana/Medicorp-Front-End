@@ -118,6 +118,7 @@ const appSettings = {
     },
     presentationHistory: {
       GetPresentationHistory: "/ApiUserPresentationHistory/GetPresentationHistory",
+      GetPresentationHistoryByPresentationId: "/ApiUserPresentationHistory/GetPresentationHistoryByPresentationId?PresentationId={0}",
       CreatePresentationHistory: "/ApiUserPresentationHistory/CreatePresentationHistory",
     },
     city: {
@@ -168,6 +169,7 @@ const appSettings = {
     time: { type: "time", group: "nullable" },
     dateTime: { type: "datetime", group: "nullable" },
     image: { type: "image", group: "array" },
+    defaultImage: { type: "defaultImage", group: "array" },
     imageDropzone: { type: "imageDropzone", group: "array" },
     dateRange: { type: "dateRange", group: "array" },
     label: { type: "label" },
